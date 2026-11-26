@@ -1,0 +1,20 @@
+<div class="nota-voz">
+  <p class="ayuda">Graba una nota de entre 1 y 60 segundos. Se preparará como WAV mono; el archivo máximo es de 3 MiB.</p>
+  @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+  @if (grabando()) {
+    <p class="estado" role="status">Grabando… {{ segundos() }} s de 60 s</p>
+    <button type="button" class="detener" (click)="detener()">Detener grabación</button>
+  } @else if (procesando()) {
+    <p class="estado" role="status">Preparando la nota de voz…</p>
+  } @else if (archivo(); as nota) {
+    <p class="estado" role="status">Nota de voz lista: {{ nota.size / 1024 | number:'1.0-0' }} KiB. Escúchala antes de enviar.</p>
+    <audio controls preload="metadata" [src]="url()" aria-label="Reproducir nota de voz grabada"></audio>
+    <div class="acciones">
+      <button type="button" [disabled]="disabled" (click)="borrar()">Borrar nota</button>
+      <button type="button" [disabled]="disabled" (click)="iniciar()">Volver a grabar</button>
+    </div>
+  } @else {
+    <button type="button" class="grabar" [disabled]="disabled" (click)="iniciar()">Grabar nota de voz</button>
+    <p class="ayuda">El permiso del micrófono se solicita solo al pulsar este botón.</p>
+  }
+</div>

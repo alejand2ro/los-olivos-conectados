@@ -1,0 +1,25 @@
+<ion-content [fullscreen]="true">
+  <div class="notifications-shell" [class.modo-accesible]="perfil()?.modo_accesibilidad">
+    <a class="skip-link" href="#contenido-notificaciones">Saltar al contenido</a>
+    <app-site-header [sesionProtegida]="true" [perfilValidado]="perfil()" [zonaValidada]="zonaNombre()" />
+    <main id="contenido-notificaciones" class="content">
+      <p class="eyebrow">Tu bandeja</p><h1>Notificaciones</h1>
+      <p class="lead">Avisos internos dirigidos a tu cuenta. Una notificación guardada no confirma que alguien la haya leído personalmente.</p>
+      @if (cargando()) { <p class="notice" role="status">Cargando notificaciones…</p> }
+      @else if (error()) { <div class="notice error" role="alert"><p>{{ error() }}</p><button type="button" (click)="cargar(pagina()?.pagina ?? 1)">Reintentar</button></div> }
+      @else if (pagina(); as listado) {
+        @if (listado.resultados.length) { <app-notificacion-lista [avisos]="listado.resultados" /> }
+        @else if (listado.total === 0) { <p class="notice">Todavía no tienes notificaciones.</p> }
+        @else { <p class="notice">Esta página no contiene notificaciones. Puedes volver a la anterior.</p> }
+        @if (listado.total_paginas > 1) {
+          <div class="pagination" aria-label="Páginas de notificaciones">
+            <button type="button" (click)="cargar(listado.pagina - 1)" [disabled]="listado.pagina <= 1">Anterior</button>
+            <span>Página {{ listado.pagina }} de {{ listado.total_paginas }}</span>
+            <button type="button" (click)="cargar(listado.pagina + 1)" [disabled]="listado.pagina >= listado.total_paginas">Siguiente</button>
+          </div>
+        }
+      }
+    </main>
+    <footer>Los Olivos Conectados · Proyecto en desarrollo</footer>
+  </div>
+</ion-content>

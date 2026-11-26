@@ -1,0 +1,15 @@
+<ion-content [fullscreen]="true">
+  <div class="internal-shell">
+    <a class="skip-link" href="#autoridad-contenido">Saltar al contenido</a>
+    <app-site-header [sesionProtegida]="true" [perfilValidado]="perfil()" />
+    <main id="autoridad-contenido" class="content">
+      <p class="eyebrow">Espacio interno</p>
+      <h1>Panel de Autoridad</h1>
+      <p class="lead">Bienvenido, {{ perfil()?.nombre }}. La gestión de incidentes y los avisos SOS se incorporarán cuando sus consultas y acciones estén disponibles.</p>
+      <section class="card" aria-labelledby="panel-estado">
+        <h2 id="panel-estado">Funciones en preparación</h2>
+        <p>Esta primera versión permite acceder con una cuenta de Autoridad. La bandeja de incidentes, la verificación y los cambios de estado aún no están operativos.</p>
+      </section>
+    </main>
+  </div>
+</ion-content>

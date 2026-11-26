@@ -1,0 +1,106 @@
+<ion-content [fullscreen]="true">
+  <div class="reportar-shell" [class.modo-accesible]="perfil()?.modo_accesibilidad">
+    <a class="skip-link" href="#contenido-reportar">Saltar al contenido</a>
+    <app-site-header [sesionProtegida]="true" [perfilValidado]="perfil()" [zonaValidada]="zonaNombre()" />
+    <main id="contenido-reportar" class="content">
+      <a class="back-link" routerLink="/mis-reportes">← Mis Reportes</a>
+      <p class="eyebrow">Nuevo reporte</p>
+      <h1>Reportar un incidente</h1>
+      <p class="lead">Describe el hecho y señala su ubicación real. Tu reporte quedará pendiente de verificación; no aparecerá como alerta pública al enviarlo.</p>
+
+      @if (creado(); as reporte) {
+        <section class="success-card" role="status" aria-labelledby="reporte-creado-titulo">
+          <span class="success-mark" aria-hidden="true">✓</span>
+          <div>
+            <h2 id="reporte-creado-titulo">Reporte enviado</h2>
+            <p>Se creó el reporte <strong>#{{ reporte.id }}</strong> con estado <strong>{{ reporte.estado_nombre }}</strong>.</p>
+            <p class="small">Código del estado: {{ reporte.estado_codigo }}. Puedes seguirlo en Mis Reportes.</p>
+            @if (enviando()) { <p role="status">Subiendo las evidencias seleccionadas…</p> }
+            @else { <a class="primary-link" routerLink="/mis-reportes">Ir a Mis Reportes</a> }
+          </div>
+        </section>
+        @if (evidencias().length) {
+          <section class="form-card resultado-evidencias" aria-labelledby="resultado-evidencias-titulo">
+            <h2 id="resultado-evidencias-titulo">Evidencias del reporte #{{ reporte.id }}</h2>
+            <p>El reporte ya está creado. Cada archivo se confirma por separado; los fallidos pueden reintentarse sin crear otro reporte.</p>
+            <app-adjuntos-evidencia [adjuntos]="evidencias()" [reporteCreado]="true" [bloqueado]="enviando()" [error]="errorEvidencias()" (reintentar)="reintentarEvidencias()" />
+          </section>
+        }
+      } @else {
+        @if (cargandoCatalogos()) {
+          <p class="notice" role="status">Cargando tipos de incidente, niveles de gravedad y zonas…</p>
+        } @else if (errorCatalogos()) {
+          <div class="notice error" role="alert"><p>{{ errorCatalogos() }}</p><button type="button" (click)="cargarCatalogos()">Reintentar carga</button></div>
+        }
+
+        <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+          <fieldset [disabled]="enviando() || cargandoCatalogos() || !!errorCatalogos()">
+            <section class="form-card" aria-labelledby="clasificacion-titulo">
+              <div class="section-title"><span class="step" aria-hidden="true">1</span><div><h2 id="clasificacion-titulo">Tipo de incidente</h2><p>Selecciona el tipo y la gravedad que correspondan al hecho.</p></div></div>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="reporte-tipo">Tipo de incidente</label>
+                  <select id="reporte-tipo" formControlName="tipo_incidente_id" required [attr.aria-invalid]="formulario.controls.tipo_incidente_id.touched && formulario.controls.tipo_incidente_id.invalid" [attr.aria-describedby]="formulario.controls.tipo_incidente_id.touched && formulario.controls.tipo_incidente_id.invalid ? 'reporte-tipo-error' : null">
+                    <option value="">Selecciona un tipo</option>
+                    @for (tipo of catalogos()?.tipos_incidente ?? []; track tipo.id) { <option [value]="tipo.id">{{ tipo.nombre }}</option> }
+                  </select>
+                  @if (formulario.controls.tipo_incidente_id.touched && formulario.controls.tipo_incidente_id.invalid) { <p id="reporte-tipo-error" class="field-error">Selecciona un tipo de incidente.</p> }
+                </div>
+                <div class="field">
+                  <label for="reporte-gravedad">Nivel de gravedad</label>
+                  <select id="reporte-gravedad" formControlName="nivel_gravedad_id" required [attr.aria-invalid]="formulario.controls.nivel_gravedad_id.touched && formulario.controls.nivel_gravedad_id.invalid" [attr.aria-describedby]="formulario.controls.nivel_gravedad_id.touched && formulario.controls.nivel_gravedad_id.invalid ? 'reporte-gravedad-error' : null">
+                    <option value="">Selecciona la gravedad</option>
+                    @for (nivel of catalogos()?.niveles_gravedad ?? []; track nivel.id) { <option [value]="nivel.id">{{ nivel.nombre }}</option> }
+                  </select>
+                  @if (formulario.controls.nivel_gravedad_id.touched && formulario.controls.nivel_gravedad_id.invalid) { <p id="reporte-gravedad-error" class="field-error">Selecciona un nivel de gravedad.</p> }
+                </div>
+              </div>
+            </section>
+
+            <section class="form-card" aria-labelledby="ubicacion-titulo">
+              <div class="section-title"><span class="step" aria-hidden="true">2</span><div><h2 id="ubicacion-titulo">Ubicación del incidente</h2><p>Selecciona la zona y señala en el mapa dónde ocurrió.</p></div></div>
+              <div class="field">
+                <label for="reporte-zona">Zona del incidente</label>
+                <select id="reporte-zona" formControlName="zona_id" required [attr.aria-invalid]="formulario.controls.zona_id.touched && formulario.controls.zona_id.invalid" [attr.aria-describedby]="formulario.controls.zona_id.touched && formulario.controls.zona_id.invalid ? 'reporte-zona-error' : 'reporte-zona-ayuda'">
+                  <option value="">Selecciona una zona</option>
+                  @for (zona of catalogos()?.zonas ?? []; track zona.id) { <option [value]="zona.id">{{ zona.nombre }}</option> }
+                </select>
+                <p id="reporte-zona-ayuda" class="field-hint">Se propone tu zona de residencia; cámbiala si el hecho ocurrió en otra.</p>
+                @if (formulario.controls.zona_id.touched && formulario.controls.zona_id.invalid) { <p id="reporte-zona-error" class="field-error">Selecciona la zona del incidente.</p> }
+              </div>
+              <app-selector-ubicacion [disabled]="enviando() || cargandoCatalogos() || !!errorCatalogos()" (puntoCambiado)="cambiarPunto($event)" />
+            </section>
+
+            <section class="form-card" aria-labelledby="descripcion-titulo">
+              <div class="section-title"><span class="step" aria-hidden="true">3</span><div><h2 id="descripcion-titulo">¿Qué sucedió?</h2><p>Describe el incidente por escrito o con una nota de voz.</p></div></div>
+              <div class="description-modes" role="group" aria-label="Forma de describir el incidente">
+                <button type="button" [attr.aria-pressed]="modoDescripcion() === 'texto'" (click)="elegirDescripcion('texto')">Escribir descripción</button>
+                <button type="button" [attr.aria-pressed]="modoDescripcion() === 'audio'" (click)="elegirDescripcion('audio')">Grabar nota de voz</button>
+              </div>
+              @if (modoDescripcion() === 'texto') {
+                <div class="field">
+                  <label for="reporte-descripcion">Descripción escrita</label>
+                  <textarea id="reporte-descripcion" rows="6" formControlName="descripcion_texto" required [attr.aria-invalid]="formulario.controls.descripcion_texto.touched && formulario.controls.descripcion_texto.invalid" [attr.aria-describedby]="formulario.controls.descripcion_texto.touched && formulario.controls.descripcion_texto.invalid ? 'reporte-descripcion-error' : null" placeholder="Describe lo que ocurrió sin incluir datos personales innecesarios."></textarea>
+                  @if (formulario.controls.descripcion_texto.touched && formulario.controls.descripcion_texto.invalid) { <p id="reporte-descripcion-error" class="field-error">Escribe una descripción del incidente.</p> }
+                </div>
+              } @else {
+                <app-nota-voz [disabled]="enviando()" (audioCambiado)="notaVoz.set($event)" />
+                <p class="field-hint">Si no puedes usar el micrófono, elige “Escribir descripción”.</p>
+              }
+            </section>
+
+            <section class="form-card" aria-labelledby="evidencias-titulo">
+              <div class="section-title"><span class="step" aria-hidden="true">4</span><div><h2 id="evidencias-titulo">Fotografías y video</h2><p>Adjunta evidencias si las tienes. El reporte se crea primero y luego se suben los archivos.</p></div></div>
+              <app-adjuntos-evidencia [adjuntos]="evidencias()" [bloqueado]="enviando()" [error]="errorEvidencias()" (agregar)="agregarEvidencias($event)" (quitar)="quitarEvidencia($event)" />
+            </section>
+          </fieldset>
+          @if (errorEnvio()) {
+            <div class="notice error" role="alert"><p>{{ errorEnvio() }}</p>@if (!perfil()) { <a routerLink="/inicio">Ir a iniciar sesión</a> }</div>
+          }
+          <div class="form-actions"><a routerLink="/mis-reportes">Cancelar</a><button class="submit-button" type="submit" [disabled]="enviando() || cargandoCatalogos() || !!errorCatalogos() || !perfil() || !puntoSeleccionado() || formulario.controls.latitud.invalid || formulario.controls.longitud.invalid || (modoDescripcion() === 'audio' && !notaVoz())">{{ enviando() ? 'Enviando reporte…' : 'Enviar reporte' }}</button></div>
+        </form>
+      }
+    </main>
+    <footer>Los Olivos Conectados · Proyecto en desarrollo</footer>
+  </div>
+</ion-content>

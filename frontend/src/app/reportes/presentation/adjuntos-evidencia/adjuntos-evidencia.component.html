@@ -1,0 +1,40 @@
+<div class="adjuntos">
+  @if (!reporteCreado || permitirAgregarDespues) {
+    <label class="seleccionar" for="evidencias-archivo">Seleccionar fotografías o video</label>
+    <input id="evidencias-archivo" type="file" multiple accept="image/jpeg,image/png,video/mp4" [disabled]="bloqueado" (change)="seleccionar($event)" />
+    <p class="ayuda">Hasta 4 fotografías JPEG/PNG de 5 MiB cada una y 1 video MP4 (H.264) de 20 MiB y 120 segundos. Máximo 5 archivos por reporte.</p>
+  }
+  @if (error) { <p class="error" role="alert">{{ error }}</p> }
+  @if (adjuntos.length) {
+    <ul class="lista">
+      @for (item of adjuntos; track item.clave) {
+        <li>
+          <div class="vista">
+            @if (!item.vistaPrevia) { <span class="sin-vista">Sin vista previa</span> }
+            @else if (item.tipo === 'foto') { <img [src]="item.vistaPrevia" [alt]="'Vista previa de ' + item.archivo.name" /> }
+            @else { <video [src]="item.vistaPrevia" controls preload="metadata" [attr.aria-label]="'Vista previa de ' + item.archivo.name"></video> }
+          </div>
+          <div class="datos">
+            <strong>{{ item.archivo.name }}</strong>
+            <span>{{ item.tipo === 'foto' ? 'Fotografía' : 'Video' }} · {{ (item.archivo.size / 1024 / 1024).toFixed(2) }} MiB</span>
+            <span class="estado" [class.guardado]="item.estado === 'guardado'" [class.fallido]="item.estado === 'fallido'" role="status">
+              @switch (item.estado) {
+                @case ('seleccionado') { Seleccionado }
+                @case ('subiendo') { Subiéndose… }
+                @case ('guardado') { Guardado · evidencia #{{ item.evidenciaId }} }
+                @case ('fallido') { Fallido }
+              }
+            </span>
+            @if (item.error) { <span class="detalle-error">{{ item.error }}</span> }
+          </div>
+          @if ((!reporteCreado || permitirAgregarDespues) && !bloqueado && item.estado !== 'guardado') { <button type="button" (click)="quitar.emit(item.clave)" [attr.aria-label]="'Quitar ' + item.archivo.name">Quitar</button> }
+        </li>
+      }
+    </ul>
+  } @else if (!reporteCreado || permitirAgregarDespues) {
+    <p class="ayuda">No hay evidencias seleccionadas. Son opcionales.</p>
+  }
+  @if (reporteCreado && hayFallidos) {
+    <button class="reintentar" type="button" [disabled]="bloqueado" (click)="reintentar.emit()">Reintentar solo los fallidos</button>
+  }
+</div>

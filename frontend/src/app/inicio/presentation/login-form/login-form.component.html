@@ -1,0 +1,40 @@
+<div class="form-heading">
+  <span class="section-kicker">Acceso a tu cuenta</span>
+  <h2 id="acceso-titulo">Bienvenido a Los Olivos Conectados</h2>
+  <p>Ingresa con el correo y la contraseña de tu cuenta.</p>
+</div>
+
+<form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+  <fieldset [disabled]="cargando">
+    <div class="field">
+      <label for="login-correo">Correo electrónico</label>
+      <input id="login-correo" type="email" autocomplete="username" inputmode="email"
+        formControlName="correo" maxlength="150" required
+        [attr.aria-invalid]="formulario.controls.correo.touched && formulario.controls.correo.invalid" />
+      @if (formulario.controls.correo.touched && formulario.controls.correo.invalid) {
+        <p class="field-error">Ingresa un correo válido.</p>
+      }
+    </div>
+
+    <app-password-field
+      id="login-contrasena"
+      [control]="formulario.controls.contrasena"
+      autocompletar="current-password"
+    />
+    @if (formulario.controls.contrasena.touched && formulario.controls.contrasena.invalid) {
+      <p class="field-error">Ingresa tu contraseña.</p>
+    }
+
+    @if (error) {
+      <p class="notice error" role="alert">{{ error }}</p>
+    }
+
+    <button class="primary-button" type="submit">
+      {{ cargando ? 'Ingresando…' : 'Iniciar sesión' }}
+    </button>
+  </fieldset>
+</form>
+
+<p class="switch-copy">¿Aún no tienes cuenta?
+  <button type="button" class="text-button" (click)="abrirRegistro.emit()">Crear cuenta</button>
+</p>

@@ -1,0 +1,36 @@
+<ion-content [fullscreen]="true">
+  <div class="internal-shell">
+    <a class="skip-link" href="#administracion-contenido">Saltar al contenido</a>
+    <app-site-header [sesionProtegida]="true" [perfilValidado]="perfil()" />
+    <main id="administracion-contenido" class="content">
+      <p class="eyebrow">Administración interna</p>
+      <h1>Crear cuenta de Autoridad</h1>
+      <p class="lead">Solo un Administrador puede dar de alta estas cuentas. El acceso se realiza después con el correo y la contraseña asignados.</p>
+      <section class="card" aria-labelledby="alta-titulo">
+        <h2 id="alta-titulo">Nueva cuenta</h2>
+        @if (creada(); as cuenta) {
+          <p class="notice success" role="status">Cuenta de Autoridad #{{ cuenta.id }} creada para {{ cuenta.nombre }} ({{ cuenta.correo }}).</p>
+        }
+        @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+        <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+          <fieldset [disabled]="enviando()">
+            <div class="field"><label for="autoridad-nombre">Nombre completo</label>
+              <input id="autoridad-nombre" type="text" formControlName="nombre" maxlength="150" autocomplete="name" required />
+              @if (formulario.controls.nombre.touched && formulario.controls.nombre.invalid) { <small>Ingresa un nombre de hasta 150 caracteres.</small> }
+            </div>
+            <div class="field"><label for="autoridad-correo">Correo electrónico</label>
+              <input id="autoridad-correo" type="email" formControlName="correo" maxlength="150" autocomplete="email" required />
+              @if (formulario.controls.correo.touched && formulario.controls.correo.invalid) { <small>Ingresa un correo válido.</small> }
+            </div>
+            <div class="field"><label for="autoridad-clave">Contraseña inicial</label>
+              <input id="autoridad-clave" type="password" formControlName="contrasena" minlength="8" maxlength="128" autocomplete="new-password" required />
+              @if (formulario.controls.contrasena.touched && formulario.controls.contrasena.invalid) { <small>Usa entre 8 y 128 caracteres.</small> }
+            </div>
+            <button type="submit" [disabled]="enviando()">{{ enviando() ? 'Creando cuenta…' : 'Crear Autoridad' }}</button>
+          </fieldset>
+        </form>
+      </section>
+      <p class="pending">El resto de funciones de administración se incorporará por etapas.</p>
+    </main>
+  </div>
+</ion-content>

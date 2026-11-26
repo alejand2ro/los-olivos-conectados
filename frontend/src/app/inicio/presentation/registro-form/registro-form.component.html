@@ -1,0 +1,127 @@
+@if (exito) {
+  <div class="success-panel" role="status">
+    <span class="success-mark" aria-hidden="true">✓</span>
+    <h2>Cuenta creada</h2>
+    <p>Tu registro se completó. Ingresa con tu correo y contraseña para acceder a tu cuenta.</p>
+    <button type="button" class="primary-button" (click)="volverAlLogin.emit()">Ir a iniciar sesión</button>
+  </div>
+} @else {
+  <div class="form-heading">
+    <span class="section-kicker">Nueva cuenta</span>
+    <h2 id="registro-titulo">Crea tu cuenta</h2>
+    <p>Elige tu rol y tu zona de residencia para participar cuando las funciones vecinales estén disponibles.</p>
+  </div>
+
+  @if (cargandoCatalogos) {
+    <p class="notice" role="status">Cargando zonas y roles…</p>
+  } @else if (errorCatalogos) {
+    <div class="notice error" role="alert">
+      <p>{{ errorCatalogos }}</p>
+      <button type="button" class="text-button" (click)="reintentarCatalogos.emit()">Reintentar carga</button>
+    </div>
+  } @else if (catalogos && (!catalogos.zonas.length || !catalogos.roles_publicos.length)) {
+    <p class="notice error" role="alert">No hay zonas o roles disponibles para el registro.</p>
+  }
+
+  <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+    <fieldset [disabled]="enviando || cargandoCatalogos || !opcionesDisponibles">
+      <div class="field">
+        <label for="registro-nombre">Nombre completo</label>
+        <input id="registro-nombre" type="text" autocomplete="name" formControlName="nombre" maxlength="150" required
+          [attr.aria-invalid]="formulario.controls.nombre.touched && formulario.controls.nombre.invalid" />
+        @if (formulario.controls.nombre.touched && formulario.controls.nombre.invalid) {
+          <p class="field-error">Ingresa tu nombre (máximo 150 caracteres).</p>
+        }
+      </div>
+
+      <div class="two-fields">
+        <div class="field">
+          <label for="registro-correo">Correo electrónico</label>
+          <input id="registro-correo" type="email" inputmode="email" autocomplete="email" formControlName="correo" maxlength="150" required
+            [attr.aria-invalid]="formulario.controls.correo.touched && formulario.controls.correo.invalid" />
+          @if (formulario.controls.correo.touched && formulario.controls.correo.invalid) {
+            <p class="field-error">Ingresa un correo válido.</p>
+          }
+        </div>
+        <div class="field">
+          <label for="registro-telefono">Teléfono <span class="optional">(opcional)</span></label>
+          <input id="registro-telefono" type="tel" inputmode="tel" autocomplete="tel" formControlName="telefono" maxlength="20"
+            [attr.aria-invalid]="formulario.controls.telefono.touched && formulario.controls.telefono.invalid" />
+          @if (formulario.controls.telefono.touched && formulario.controls.telefono.invalid) {
+            <p class="field-error">Usa como máximo 20 caracteres.</p>
+          }
+        </div>
+      </div>
+
+      <div class="two-fields">
+        <div class="field">
+          <label for="registro-rol">Tipo de cuenta</label>
+          <select id="registro-rol" formControlName="rol" required
+            [attr.aria-invalid]="formulario.controls.rol.touched && formulario.controls.rol.invalid">
+            <option value="">Selecciona un rol</option>
+            @for (rol of catalogos?.roles_publicos ?? []; track rol.id) {
+              <option [value]="rol.nombre">{{ rol.nombre === 'vecino' ? 'Vecino' : 'Comerciante' }}</option>
+            }
+          </select>
+          @if (formulario.controls.rol.touched && formulario.controls.rol.invalid) {
+            <p class="field-error">Selecciona un tipo de cuenta.</p>
+          }
+        </div>
+        <div class="field">
+          <label for="registro-zona">Zona de residencia</label>
+          <select id="registro-zona" formControlName="zona_id" required
+            [attr.aria-invalid]="formulario.controls.zona_id.touched && formulario.controls.zona_id.invalid">
+            <option value="">Selecciona tu zona</option>
+            @for (zona of catalogos?.zonas ?? []; track zona.id) {
+              <option [value]="zona.id">{{ zona.nombre }}</option>
+            }
+          </select>
+          @if (formulario.controls.zona_id.touched && formulario.controls.zona_id.invalid) {
+            <p class="field-error">Selecciona tu zona de residencia.</p>
+          }
+        </div>
+      </div>
+
+      <app-password-field id="registro-contrasena" etiqueta="Contraseña" autocompletar="new-password"
+        ayuda="Entre 8 y 128 caracteres." [control]="formulario.controls.contrasena" />
+      @if (formulario.controls.contrasena.touched && formulario.controls.contrasena.invalid) {
+        <p class="field-error">La contraseña debe tener entre 8 y 128 caracteres.</p>
+      }
+
+      <label class="choice accessibility-choice">
+        <input type="checkbox" formControlName="modo_accesibilidad" (change)="cambiarModo()" />
+        <span><strong>Modo de accesibilidad</strong><small>Aumenta el texto y el contraste de esta pantalla.</small></span>
+      </label>
+
+      <div class="privacy-note">
+        <strong>Sobre tus datos</strong>
+        <p>Para crear la cuenta se guardan tu nombre, correo, zona y, si lo indicas, teléfono. La zona se usará para el chat y los avisos; el teléfono no se muestra públicamente. Aún falta publicar la información completa sobre responsable, conservación, derechos y contacto.</p>
+      </div>
+
+      <label class="choice">
+        <input type="checkbox" formControlName="consentimiento_privacidad_aceptado" required />
+        <span>Acepto el uso de mis datos para la cuenta y las funciones vecinales descritas.</span>
+      </label>
+      @if (formulario.controls.consentimiento_privacidad_aceptado.touched && formulario.controls.consentimiento_privacidad_aceptado.invalid) {
+        <p class="field-error">Debes aceptar el uso de datos para registrarte.</p>
+      }
+
+      <label class="choice">
+        <input type="checkbox" formControlName="compromiso_sos_aceptado" required />
+        <span>Me comprometo a usar SOS y los reportes de forma responsable cuando estén disponibles.</span>
+      </label>
+      @if (formulario.controls.compromiso_sos_aceptado.touched && formulario.controls.compromiso_sos_aceptado.invalid) {
+        <p class="field-error">Debes aceptar el compromiso de uso responsable.</p>
+      }
+
+      @if (error) {
+        <p class="notice error" role="alert">{{ error }}</p>
+      }
+      <button class="primary-button" type="submit">{{ enviando ? 'Creando cuenta…' : 'Crear cuenta' }}</button>
+    </fieldset>
+  </form>
+
+  <p class="switch-copy">¿Ya tienes cuenta?
+    <button type="button" class="text-button" (click)="volverAlLogin.emit()">Iniciar sesión</button>
+  </p>
+}

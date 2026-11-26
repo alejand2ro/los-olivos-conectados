@@ -1,0 +1,39 @@
+<ion-content [fullscreen]="true">
+  <div class="perfil-shell" [class.modo-accesible]="perfil()?.modo_accesibilidad">
+    <a class="skip-link" href="#contenido-perfil">Saltar al contenido</a>
+    <app-site-header [sesionProtegida]="true" [perfilValidado]="perfil()" [zonaValidada]="zonaNombre()" />
+    <main id="contenido-perfil" class="content">
+      <p class="eyebrow">Tu cuenta</p><h1>Mi perfil</h1>
+      @if (cargando()) {
+        <p class="notice" role="status">Cargando tu perfil…</p>
+      } @else {
+        @if (error()) { <p class="notice error" role="alert">{{ error() }}</p> }
+        @if (perfil(); as cuenta) {
+          <section class="card" aria-labelledby="datos-cuenta">
+            <h2 id="datos-cuenta">Datos de tu cuenta</h2>
+            <dl class="datos">
+              <div><dt>Nombre</dt><dd>{{ cuenta.nombre }}</dd></div>
+              <div><dt>Correo</dt><dd>{{ cuenta.correo }}</dd></div>
+              <div><dt>Rol</dt><dd>{{ cuenta.rol }}</dd></div>
+              <div><dt>Zona de residencia</dt><dd>{{ zonaNombre() || (cuenta.zona_id === null ? 'Sin zona asignada' : 'Zona no disponible') }}</dd></div>
+              <div><dt>Alias de chat</dt><dd>{{ cuenta.alias_chat || 'Sin alias' }}</dd></div>
+            </dl>
+          </section>
+          <section class="card" aria-labelledby="editar-cuenta">
+            <h2 id="editar-cuenta">Editar perfil</h2>
+            <p>Solo puedes cambiar tu teléfono y la preferencia de accesibilidad.</p>
+            <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+              <label for="telefono-perfil">Teléfono (opcional)</label>
+              <input id="telefono-perfil" type="tel" autocomplete="tel" formControlName="telefono" maxlength="20" [attr.aria-invalid]="formulario.controls.telefono.invalid && formulario.controls.telefono.touched" [attr.aria-describedby]="formulario.controls.telefono.invalid && formulario.controls.telefono.touched ? 'telefono-error' : null" />
+              @if (formulario.controls.telefono.invalid && formulario.controls.telefono.touched) { <p id="telefono-error" class="field-error">El teléfono admite hasta 20 caracteres.</p> }
+              <label class="check"><input type="checkbox" formControlName="modo_accesibilidad" /><span>Modo de accesibilidad: texto más grande y contraste legible</span></label>
+              @if (confirmacion()) { <p class="success" role="status">{{ confirmacion() }}</p> }
+              <button type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Guardar cambios' }}</button>
+            </form>
+          </section>
+        } @else if (error()) { <button type="button" (click)="cargar()">Reintentar</button> }
+      }
+    </main>
+    <footer>Los Olivos Conectados · Proyecto en desarrollo</footer>
+  </div>
+</ion-content>

@@ -1,0 +1,21 @@
+:host { display:block; min-width:0; }
+:host *, :host *::before, :host *::after { box-sizing:border-box; }
+.adjuntos { display:grid; gap:.8rem; min-width:0; }
+.seleccionar { display:inline-flex; width:fit-content; min-height:2.8rem; align-items:center; padding:.6rem 1rem; border:1px solid #1e3a8a; border-radius:.7rem; color:#1e3a8a; background:#eff4ff; font-weight:800; cursor:pointer; }
+input[type=file] { width:100%; max-width:100%; padding:.5rem; border:1px dashed #b9c9e1; border-radius:.7rem; font:inherit; }
+.ayuda { margin:0; color:#53627b; font-size:.84rem; line-height:1.5; }
+.error,.detalle-error { color:#9b1d18; }
+.error { margin:0; padding:.7rem 1rem; border:1px solid #f0c7c1; border-radius:.7rem; background:#fff0ed; }
+.lista { display:grid; gap:.65rem; margin:0; padding:0; list-style:none; }
+li { display:flex; align-items:center; gap:.8rem; min-width:0; padding:.65rem; border:1px solid #dce6f2; border-radius:.75rem; background:#f8fbff; }
+.vista { width:5.5rem; height:4.5rem; flex:none; overflow:hidden; border-radius:.5rem; background:#e9eef6; }
+.vista img,.vista video { display:block; width:100%; height:100%; object-fit:cover; }
+.sin-vista { display:grid; place-items:center; height:100%; padding:.3rem; color:#53627b; font-size:.7rem; text-align:center; }
+.datos { display:grid; gap:.2rem; min-width:0; flex:1; font-size:.82rem; color:#53627b; }
+.datos strong { overflow-wrap:anywhere; color:#122441; font-size:.88rem; }
+.estado { font-weight:800; color:#1e3a8a; }.estado.guardado { color:#006c4a; }.estado.fallido { color:#9b1d18; }
+button { min-height:2.5rem; padding:.4rem .65rem; border:1px solid #1e3a8a; border-radius:.6rem; color:#1e3a8a; background:#fff; font:inherit; font-weight:800; cursor:pointer; }
+button:disabled { opacity:.6; cursor:default; }
+.reintentar { width:fit-content; }
+button:focus-visible,input:focus-visible,.seleccionar:focus-visible { outline:3px solid #f5ae46; outline-offset:3px; }
+@media(max-width:520px) { li { flex-wrap:wrap; }.datos { flex-basis:calc(100% - 6.5rem); } li button { margin-left:auto; } }

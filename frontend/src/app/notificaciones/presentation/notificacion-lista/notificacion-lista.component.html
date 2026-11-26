@@ -1,0 +1,13 @@
+<ul class="notification-list">
+  @for (aviso of avisos; track aviso.id) {
+    <li [class.unread]="!aviso.leido">
+      <span class="mark" aria-hidden="true">{{ aviso.tipo === 'sos' ? '!' : '•' }}</span>
+      <div class="copy">
+        <strong>{{ titulo(aviso) }}</strong>
+        <span>{{ referencia(aviso) }}</span>
+        <time [attr.datetime]="aviso.fecha_envio">{{ aviso.fecha_envio | date:'medium' }}</time>
+      </div>
+      @if (!aviso.leido) { <span class="state">Sin leer</span> }
+    </li>
+  }
+</ul>

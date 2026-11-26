@@ -35,3 +35,13 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+@import 'leaflet/dist/leaflet.css';
+
+/* El marcador se inserta dinámicamente por Leaflet fuera del árbol de estilos del componente. */
+.incidente-marcador { background:transparent; border:0; }
+.incidente-marcador span { display:block; width:28px; height:28px; border:4px solid #fff; border-radius:50% 50% 50% 0; background:#cf3526; box-shadow:0 2px 10px #17264780; transform:rotate(-45deg); }
+
+/* Preferencia de accesibilidad del perfil autenticado, aplicada tras validar la sesión. */
+html.modo-accesible-cuenta { font-size: 112.5%; }
+html.modo-accesible-cuenta body { --ion-text-color: #10213c; }

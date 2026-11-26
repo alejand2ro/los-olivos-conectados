@@ -1,0 +1,71 @@
+<header class="site-header" [class.auth-header]="!!perfil()" [class.internal-header]="cuentaInterna">
+  <div class="header-inner">
+    <div class="brand" aria-label="Los Olivos Conectados">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none">
+          <path d="M20 3 34 8v10c0 9-5.4 15-14 19C11.4 33 6 27 6 18V8L20 3Z" stroke="currentColor" stroke-width="2.5" />
+          <path d="M12 23v-8h5v8m6 0V11h5v12M10 25h20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+      <span class="brand-copy"><strong>Los Olivos Conectados</strong><small>Seguridad y comunicación vecinal</small></span>
+    </div>
+
+    @if (!verificando()) {
+      @if (perfil(); as cuenta) {
+        <button #menu class="menu-toggle icon-button" type="button" aria-label="Abrir o cerrar el menú" [attr.aria-controls]="cuentaInterna ? 'navegacion-interna' : 'navegacion-vecinal'" [attr.aria-expanded]="menuAbierto()" (click)="alternarMenu()">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+        </button>
+        @if (cuentaInterna) {
+          <nav id="navegacion-interna" class="nav-auth" [class.open]="menuAbierto()" aria-label="Navegación interna">
+            <a [routerLink]="rutaInterna" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page" (click)="menuAbierto.set(false)">{{ cuenta.rol === 'autoridad' ? 'Panel de Autoridad' : 'Administración' }}</a>
+          </nav>
+        } @else {
+          <nav id="navegacion-vecinal" class="nav-auth" [class.open]="menuAbierto()" aria-label="Navegación vecinal">
+            <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page" (click)="menuAbierto.set(false)">Inicio</a>
+            <span class="nav-pending" aria-disabled="true">Mapa Comunitario <small>Próximamente</small></span>
+            <a routerLink="/mis-reportes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page" (click)="menuAbierto.set(false)">Mis Reportes</a>
+            <span class="nav-pending" aria-disabled="true">Chat Vecinal <small>Próximamente</small></span>
+            <a routerLink="/alertas" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page" (click)="menuAbierto.set(false)">Alertas verificadas</a>
+          </nav>
+        }
+        <div class="header-actions">
+          @if (!cuentaInterna) {
+          <button #campana class="icon-button" type="button" aria-label="Notificaciones" aria-controls="panel-notificaciones" [attr.aria-expanded]="panelAbierto()" (click)="alternarPanel()">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 9h18c0-1-3-2-3-9ZM10 21h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </button>
+          }
+          <button #cuentaBoton class="account-button" type="button" aria-controls="panel-cuenta" [attr.aria-expanded]="cuentaAbierta()" (click)="alternarCuenta()">
+            <span class="avatar" aria-hidden="true">{{ iniciales }}</span>
+            <span class="account-copy"><strong>{{ cuenta.nombre }}</strong><small>{{ subtituloCuenta }}</small></span>
+            <span class="account-chevron" aria-hidden="true">⌄</span>
+            <span class="sr-only">Abrir cuenta</span>
+          </button>
+        </div>
+        @if (!cuentaInterna && panelAbierto()) {
+          <section id="panel-notificaciones" class="popover notifications-panel" role="region" aria-labelledby="titulo-notificaciones">
+            <div class="popover-head"><h2 #tituloPanel id="titulo-notificaciones" tabindex="-1">Notificaciones</h2><button type="button" class="close-button" aria-label="Cerrar notificaciones" (click)="cerrarPanel()">×</button></div>
+            <div class="popover-body">
+              @if (cargandoAvisos()) { <p role="status">Cargando notificaciones…</p> }
+              @else if (errorAvisos()) { <p role="alert">{{ errorAvisos() }} <button type="button" (click)="cargarAvisos()">Reintentar</button></p> }
+              @else if (sinAvisos()) { <p>Todavía no tienes notificaciones.</p> }
+              @else { <app-notificacion-lista [avisos]="avisos()" /> }
+            </div>
+            <div class="popover-foot"><a routerLink="/notificaciones" (click)="cerrarPanel()">Ver todas las notificaciones</a></div>
+          </section>
+        }
+        @if (cuentaAbierta()) {
+          <section id="panel-cuenta" class="popover account-panel" role="region" aria-label="Tu cuenta">
+            <strong>{{ cuenta.nombre }}</strong>
+            <span>{{ subtituloCuenta }}</span>
+            @if (!cuentaInterna) { <a routerLink="/perfil" (click)="cuentaAbierta.set(false)">Editar perfil</a> }
+            <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
+          </section>
+        }
+      } @else {
+        <nav class="nav-public" aria-label="Navegación pública">
+          <a routerLink="/inicio" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Inicio</a>
+        </nav>
+      }
+    }
+  </div>
+</header>

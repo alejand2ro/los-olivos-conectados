@@ -1,0 +1,76 @@
+<ion-content [fullscreen]="true">
+  <div class="dashboard-shell" [class.modo-accesible]="perfil()?.modo_accesibilidad">
+    <a class="skip-link" href="#contenido-dashboard">Saltar al contenido</a>
+    <app-site-header [sesionProtegida]="true" [perfilValidado]="perfil()" [zonaValidada]="resumen()?.zonaNombre ?? null" />
+
+    <main id="contenido-dashboard" class="content">
+      @if (cargando()) {
+        <p class="status" role="status">Cargando tu inicio…</p>
+      } @else if (error()) {
+        <p class="status error" role="alert">{{ error() }}</p>
+      } @else if (perfil(); as cuenta) {
+        <section class="welcome" aria-labelledby="saludo">
+          <p class="eyebrow">Tu espacio vecinal</p>
+          <h1 id="saludo">Hola, {{ cuenta.nombre }}</h1>
+          @if (resumen()?.zonaNombre; as zona) {
+            <p>Zona de residencia: <strong>{{ zona }}</strong></p>
+          } @else if (resumen()?.zonaError) {
+            <p role="status">No se pudo consultar el nombre de tu zona.</p>
+          } @else {
+            <p>Tu cuenta no tiene una zona de residencia asignada.</p>
+          }
+        </section>
+
+        <section class="my-report card" aria-labelledby="mis-incidencias">
+          <div class="section-head"><div><p class="eyebrow">Seguimiento personal</p><h2 id="mis-incidencias">Mis incidencias</h2></div><a routerLink="/mis-reportes">Ver mis reportes</a></div>
+          @if (resumen()?.reportesError) {
+            <p class="empty error" role="alert">No pudimos cargar tus reportes. Vuelve a intentarlo más tarde.</p>
+          } @else if (resumen()?.ultimoReporte; as reporte) {
+            <div class="report-row">
+              <span class="report-icon" aria-hidden="true">◆</span>
+              <div class="report-copy">
+                <strong>{{ reporte.es_sos ? 'SOS' : reporte.tipo_incidente || 'Incidente' }} · Reporte #{{ reporte.id }}</strong>
+                <span>{{ reporte.fecha_creacion | date:'mediumDate' }} · {{ reporte.estado_nombre }}</span>
+              </div>
+              <div class="badges">
+                <span class="badge state">{{ reporte.estado_nombre }}</span>
+                <span class="badge" [class.verified]="reporte.verificado">{{ reporte.verificado ? 'Verificado' : 'Pendiente de verificación' }}</span>
+              </div>
+            </div>
+            <p class="small-note">Mostramos tu reporte más reciente. El detalle y el historial se incorporarán después.</p>
+          } @else {
+            <p class="empty">Aún no tienes reportes. Podrás crear uno cuando esté disponible el formulario de incidentes.</p>
+          }
+        </section>
+
+        <section class="actions" aria-labelledby="acciones-titulo">
+          <div class="section-head"><div><p class="eyebrow">Accesos principales</p><h2 id="acciones-titulo">Acciones comunitarias</h2></div></div>
+          <div class="action-grid">
+            <a class="action-card available" routerLink="/reportes/nuevo"><span class="action-icon" aria-hidden="true">✎</span><h3>Reportar incidente</h3><p>Registro escrito de incidentes con ubicación real.</p><span class="action-link">Crear reporte <span aria-hidden="true">→</span></span></a>
+            <div class="action-card upcoming"><span class="action-icon" aria-hidden="true">⌖</span><h3>Ver mapa</h3><p>Incidentes verificados con ubicación aproximada.</p><span class="soon">Próximamente</span></div>
+            <a class="action-card available" routerLink="/alertas"><span class="action-icon" aria-hidden="true">✓</span><h3>Alertas verificadas</h3><p>Consulta los avisos públicos confirmados.</p><span class="action-link">Ver alertas <span aria-hidden="true">→</span></span></a>
+            <div class="action-card upcoming"><span class="action-icon" aria-hidden="true">▤</span><h3>Chat vecinal</h3><p>Conversaciones de tu zona de residencia.</p><span class="soon">Próximamente</span></div>
+          </div>
+        </section>
+
+        <section class="activity card" aria-labelledby="actividad-titulo">
+          <div class="section-head"><div><p class="eyebrow">Avisos públicos</p><h2 id="actividad-titulo">Actividad de tu zona</h2></div><a routerLink="/alertas">Ver todas las alertas</a></div>
+          @if (cuenta.zona_id === null) {
+            <p class="empty">No hay zona asociada a tu cuenta para mostrar actividad local.</p>
+          } @else if (resumen()?.alertasError) {
+            <p class="empty error" role="alert">No pudimos cargar las alertas de tu zona.</p>
+          } @else if (resumen()?.actividad?.length) {
+            <ul class="activity-list">
+              @for (alerta of resumen()!.actividad; track alerta.id) {
+                <li><span class="activity-mark" aria-hidden="true">✓</span><div><strong>{{ alerta.tipo_incidente || 'Incidente verificado' }}</strong><span>{{ alerta.zona }} · {{ alerta.fecha_publicacion | date:'medium' }}</span></div></li>
+              }
+            </ul>
+          } @else {
+            <p class="empty">Todavía no hay alertas verificadas en tu zona.</p>
+          }
+        </section>
+      }
+    </main>
+    <footer>Los Olivos Conectados · Proyecto en desarrollo</footer>
+  </div>
+</ion-content>

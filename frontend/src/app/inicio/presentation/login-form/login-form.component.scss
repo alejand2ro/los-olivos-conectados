@@ -1,0 +1,27 @@
+:host { display: block; min-width: 0; }
+:host *, :host *::before, :host *::after { box-sizing: border-box; }
+.form-heading { margin-bottom: 1.55rem; }
+.section-kicker { color: var(--green); font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+h2 { margin: .5rem 0 .55rem; color: var(--ink); font-size: clamp(1.45rem, 2.5vw, 1.8rem); line-height: 1.25; letter-spacing: -.025em; }
+.form-heading p { margin: 0; color: var(--muted); line-height: 1.55; }
+fieldset { display: grid; gap: 1.15rem; padding: 0; margin: 0; border: 0; min-width: 0; }
+.field { display: grid; gap: .45rem; min-width: 0; }
+label { color: var(--ink); font-weight: 700; font-size: .92rem; }
+input {
+  width: 100%; min-height: 3.15rem; padding: .72rem .95rem;
+  border: 1px solid var(--input-border); border-radius: .8rem;
+  background: var(--input-bg); color: var(--ink); font: inherit;
+}
+input:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+input[aria-invalid='true'] { border-color: #b42318; }
+.field-error { margin: 0; color: #a31d18; font-size: .82rem; }
+.notice { margin: .2rem 0 0; padding: .85rem 1rem; border-radius: .75rem; line-height: 1.4; overflow-wrap: anywhere; }
+.error { color: #8b1b16; background: #fff0ed; border: 1px solid #f1b2a9; }
+.primary-button {
+  min-height: 3.3rem; border: 0; border-radius: .85rem; background: var(--blue);
+  color: #fff; font: inherit; font-weight: 800; cursor: pointer; box-shadow: 0 8px 18px #1e3a8a2e;
+}
+.primary-button:hover:not(:disabled) { background: #102c75; }
+.primary-button:disabled { opacity: .65; cursor: wait; }
+.switch-copy { margin: 1.4rem 0 0; text-align: center; color: var(--muted); line-height: 1.55; }
+.text-button { border: 0; padding: .15rem .25rem; background: transparent; color: var(--green); font: inherit; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }

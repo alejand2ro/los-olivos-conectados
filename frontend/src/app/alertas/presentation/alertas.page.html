@@ -1,0 +1,34 @@
+<ion-content [fullscreen]="true">
+  <div class="alertas-shell">
+    <a class="skip-link" href="#contenido-alertas">Saltar al contenido</a>
+    <app-site-header />
+    <main id="contenido-alertas" class="content">
+      <p class="eyebrow">Información pública</p>
+      <h1>Alertas verificadas</h1>
+      <p class="lead">Incidentes publicados después de su verificación. Se muestra la zona, sin datos del autor ni ubicación exacta.</p>
+      @if (cargando()) {
+        <p class="notice" role="status">Cargando alertas…</p>
+      } @else if (error()) {
+        <div class="notice error" role="alert"><p>{{ error() }}</p><button type="button" (click)="cargar(pagina()?.pagina ?? 1)">Reintentar</button></div>
+      } @else if (pagina(); as listado) {
+        @if (listado.resultados.length) {
+          <ul class="alert-list">
+            @for (alerta of listado.resultados; track alerta.id) {
+              <li><span class="alert-mark" aria-hidden="true">✓</span><div><strong>{{ alerta.tipo_incidente || 'Incidente verificado' }}</strong><span>{{ alerta.zona }}</span><time [attr.datetime]="alerta.fecha_publicacion">{{ alerta.fecha_publicacion | date:'medium' }}</time></div><span class="badge">Verificada</span></li>
+            }
+          </ul>
+        } @else {
+          <p class="notice">Todavía no hay alertas verificadas para mostrar.</p>
+        }
+        @if (listado.total_paginas > 1) {
+          <div class="pagination" aria-label="Páginas de alertas">
+            <button type="button" (click)="cargar(listado.pagina - 1)" [disabled]="listado.pagina <= 1">Anterior</button>
+            <span>Página {{ listado.pagina }} de {{ listado.total_paginas }}</span>
+            <button type="button" (click)="cargar(listado.pagina + 1)" [disabled]="listado.pagina >= listado.total_paginas">Siguiente</button>
+          </div>
+        }
+      }
+    </main>
+    <footer>Los Olivos Conectados · Proyecto en desarrollo</footer>
+  </div>
+</ion-content>

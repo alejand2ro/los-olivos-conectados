@@ -1,0 +1,114 @@
+<ion-content [fullscreen]="true">
+  <div class="detalle-shell">
+    <a class="skip-link" href="#contenido-detalle">Saltar al contenido</a>
+    <app-site-header [sesionProtegida]="true" [perfilValidado]="perfil()" [zonaValidada]="zonaNombre()" />
+    <main id="contenido-detalle" class="content">
+      <a class="back-link" routerLink="/mis-reportes">← Mis Reportes</a>
+      @if (cargando()) {
+        <p class="notice" role="status">Cargando reporte y seguimiento…</p>
+      } @else if (error()) {
+        <div class="notice error" role="alert"><p>{{ error() }}</p><button type="button" (click)="cargar()">Reintentar</button></div>
+      } @else if (reporte(); as dato) {
+        <p class="eyebrow">Seguimiento personal</p>
+        <div class="heading"><div><h1>{{ dato.es_sos ? 'SOS' : (dato.tipo_incidente || 'Incidente') }} · Reporte #{{ dato.id }}</h1>
+          <p>Enviado <time [attr.datetime]="dato.fecha_creacion">{{ dato.fecha_creacion | date:'medium' }}</time></p></div>
+          <span class="status">{{ dato.estado_nombre }}</span>
+        </div>
+        @if (!dato.verificado) { <p class="notice">Pendiente de verificación. Este reporte aún no es una alerta pública.</p> }
+        <div class="grid">
+          <section class="card" aria-labelledby="datos-titulo">
+            <h2 id="datos-titulo">Datos del incidente</h2>
+            <dl class="facts">
+              <div><dt>Tipo</dt><dd>{{ dato.tipo_incidente || 'Sin tipo indicado' }}</dd></div>
+              <div><dt>Gravedad</dt><dd>{{ dato.nivel_gravedad }}</dd></div>
+              <div><dt>Verificación</dt><dd>{{ dato.verificado ? 'Verificado' : 'Pendiente de verificación' }}</dd></div>
+            </dl>
+            <div class="location-block">
+              <h3>Ubicación del incidente</h3>
+              <app-mapa-reporte [latitud]="dato.latitud" [longitud]="dato.longitud" />
+              <p class="location-text"><strong>Zona:</strong> {{ dato.zona_nombre }}<br />
+                <strong>Coordenadas exactas:</strong> latitud {{ dato.latitud }}, longitud {{ dato.longitud }}.</p>
+            </div>
+            @if (dato.descripcion_texto) { <h3>Descripción</h3><p class="description">{{ dato.descripcion_texto }}</p> }
+            @if (dato.descripcion_audio_url; as audio) {
+              <h3>Descripción por audio</h3>
+              @if (archivos()[audio]; as fuente) {
+                <audio controls [src]="fuente" aria-label="Audio descriptivo del reporte"></audio>
+              } @else {
+                <button type="button" (click)="abrirArchivo(audio)" [disabled]="archivosCargando().has(audio)">{{ archivosCargando().has(audio) ? 'Cargando audio…' : 'Escuchar audio' }}</button>
+              }
+              @if (erroresArchivo()[audio]) { <p class="media-error" role="alert">{{ erroresArchivo()[audio] }}</p> }
+            }
+          </section>
+          <section class="card" aria-labelledby="historial-titulo">
+            <h2 id="historial-titulo">Historial de estado</h2>
+            @if (seguimiento(); as estado) {
+              @if (estado.historial.length) {
+                <ol class="timeline">
+                  @for (cambio of estado.historial; track $index) {
+                    <li><strong>{{ cambio.estado_nombre }}</strong><time [attr.datetime]="cambio.fecha">{{ cambio.fecha | date:'medium' }}</time>
+                      @if (cambio.comentario) { <p>{{ cambio.comentario }}</p> }</li>
+                  }
+                </ol>
+              } @else { <p>No hay cambios registrados.</p> }
+            }
+          </section>
+        </div>
+        <section class="card evidence-card" aria-labelledby="evidencias-titulo">
+          <h2 id="evidencias-titulo">Fotografías y video</h2>
+          @if (dato.evidencias.length) {
+            <ul class="saved-files">
+              @for (evidencia of dato.evidencias; track evidencia.id) {
+                <li>
+                  <div class="saved-heading"><strong>{{ evidencia.tipo_archivo === 'foto' ? 'Fotografía' : 'Video' }} #{{ evidencia.id }}</strong>
+                    <time [attr.datetime]="evidencia.fecha_subida">{{ evidencia.fecha_subida | date:'medium' }}</time></div>
+                  @if (evidencia.tipo_archivo === 'foto') {
+                    @if (archivos()[evidencia.url_archivo]; as fuente) {
+                      <button class="thumbnail-button" type="button" (click)="ampliarFoto(evidencia.id, evidencia.url_archivo)"
+                        [attr.aria-label]="'Ver fotografía ' + evidencia.id + ' completa'">
+                        <img [src]="fuente" [alt]="'Miniatura de la fotografía ' + evidencia.id" />
+                        <span>Ver foto completa</span>
+                      </button>
+                    } @else if (archivosCargando().has(evidencia.url_archivo)) {
+                      <p class="muted" role="status">Cargando miniatura…</p>
+                    } @else {
+                      <button type="button" (click)="abrirArchivo(evidencia.url_archivo)">Reintentar miniatura</button>
+                    }
+                  } @else if (videoCompatible) {
+                    @if (archivos()[evidencia.url_archivo]; as fuente) {
+                      <video controls playsinline preload="metadata" [src]="fuente" [attr.aria-label]="'Video de evidencia ' + evidencia.id"></video>
+                    } @else {
+                      <button type="button" (click)="abrirArchivo(evidencia.url_archivo)" [disabled]="archivosCargando().has(evidencia.url_archivo)">
+                        {{ archivosCargando().has(evidencia.url_archivo) ? 'Preparando video…' : 'Reintentar video' }}
+                      </button>
+                    }
+                  } @else { <p class="muted">Este navegador no admite la reproducción del video MP4/H.264.</p> }
+                  @if (erroresArchivo()[evidencia.url_archivo]) { <p class="media-error" role="alert">{{ erroresArchivo()[evidencia.url_archivo] }}</p> }
+                </li>
+              }
+            </ul>
+          } @else { <p class="muted">Este reporte no tiene fotografías ni video guardados.</p> }
+          <div class="add-evidence">
+            <h3>Añadir evidencias a este reporte</h3>
+            <p class="muted">Puedes volver a seleccionar un archivo que falló, incluso si recargaste la página. El reporte #{{ dato.id }} no se volverá a crear.</p>
+            <app-adjuntos-evidencia [adjuntos]="adjuntos()" [reporteCreado]="true" [permitirAgregarDespues]="true"
+              [bloqueado]="subiendo()" [error]="errorAdjuntos()" (agregar)="agregar($event)" (quitar)="quitar($event)"
+              (reintentar)="subirAdjuntos(true)" />
+            @if (adjuntos().length) {
+              <button class="upload" type="button" [disabled]="subiendo() || !haySeleccionados()" (click)="subirAdjuntos()">
+                {{ subiendo() ? 'Subiendo archivos…' : 'Subir seleccionados' }}
+              </button>
+            }
+          </div>
+        </section>
+        <dialog #visorFoto class="photo-dialog" aria-labelledby="visor-titulo" (close)="fotoAmpliada.set(null)">
+          @if (fotoAmpliada(); as foto) {
+            <div class="dialog-heading"><h2 id="visor-titulo">Fotografía #{{ foto.id }}</h2><button type="button" (click)="cerrarFoto()">Cerrar</button></div>
+            <img [src]="foto.url" [alt]="'Fotografía de evidencia ' + foto.id + ' en tamaño completo'" />
+          }
+        </dialog>
+      }
+    </main>
+    <footer>Los Olivos Conectados · Proyecto en desarrollo</footer>
+  </div>
+</ion-content>

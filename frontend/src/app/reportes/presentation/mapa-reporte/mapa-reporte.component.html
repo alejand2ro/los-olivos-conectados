@@ -1,0 +1,5 @@
+<div class="mapa-marco">
+  <div #mapa class="mapa" role="region" tabindex="0"
+    [attr.aria-label]="'Mapa de solo lectura del reporte, latitud ' + latitud + ', longitud ' + longitud + '. El marcador no se puede mover.'"></div>
+</div>
+@if (error()) { <p class="aviso" role="status">{{ error() }}</p> }

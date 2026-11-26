@@ -1,0 +1,16 @@
+# Configuración privada y datos locales
+**/.env
+**/.env.*
+!**/.env.example
+**/private-audio/
+**/private-evidencias/
+
+# Dependencias y resultados de compilación
+**/node_modules/
+**/dist/
+frontend/www/
+frontend/.angular/
+
+# Archivos del sistema y editores
+.DS_Store
+Thumbs.db

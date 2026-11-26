@@ -1,0 +1,16 @@
+:host { display:block; height:100%; --ink:#122441; --muted:#53627b; --blue:#1e3a8a; --green:#006c4a; --focus:#f5ae46; }
+ion-content { --background:#f8faff; }
+.perfil-shell { min-height:100%; color:var(--ink); background:#f8faff; font-family:'Plus Jakarta Sans',system-ui,sans-serif; }
+.perfil-shell *, .perfil-shell *::before, .perfil-shell *::after { box-sizing:border-box; }
+.skip-link { position:absolute; top:-5rem; left:1rem; z-index:10; padding:.7rem 1rem; color:#fff; background:var(--blue); }.skip-link:focus { top:1rem; }
+.content { max-width:920px; min-height:70vh; margin:auto; padding:3rem 1.5rem 4rem; }
+.eyebrow { margin:0 0 .5rem; color:var(--green); font-size:.76rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+h1 { margin:0 0 1.5rem; font-size:clamp(1.8rem,4vw,2.6rem); }h2 { margin:0 0 1rem; font-size:1.2rem; }
+.card,.notice { margin-bottom:1rem; padding:1.4rem; border:1px solid #e1e9f5; border-radius:1rem; background:#fff; }
+.datos { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; margin:0; }.datos div { min-width:0; }dt { color:var(--muted); font-size:.85rem; }dd { margin:.25rem 0 0; font-weight:700; overflow-wrap:anywhere; }
+.card p { color:var(--muted); line-height:1.5; }form { display:grid; gap:.65rem; max-width:480px; }label { font-weight:700; }input[type=tel] { width:100%; min-height:3rem; padding:.7rem .85rem; border:1px solid #b9c9e1; border-radius:.7rem; font:inherit; }input[aria-invalid=true] { border-color:#b42318; }
+.check { display:flex; align-items:flex-start; gap:.7rem; margin:1rem 0; line-height:1.4; }.check input { width:1.2rem; height:1.2rem; flex:none; }
+button { width:max-content; max-width:100%; min-height:2.7rem; padding:.65rem 1rem; border:0; border-radius:.7rem; color:#fff; background:var(--blue); font:inherit; font-weight:800; cursor:pointer; }button:disabled { opacity:.6; cursor:default; }
+.notice.error,.field-error { color:#8b1b16; }.success { color:#005239 !important; font-weight:700; }button:focus-visible,input:focus-visible,a:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+footer { padding:1.4rem; text-align:center; color:var(--muted); background:#edf3ff; font-size:.8rem; }
+@media(max-width:620px) { .content { padding:1.7rem 1rem 3rem; }.datos { grid-template-columns:1fr; } }

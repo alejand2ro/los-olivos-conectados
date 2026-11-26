@@ -1,0 +1,47 @@
+<div class="selector-ubicacion">
+  <div class="acciones">
+    <button type="button" class="boton-ubicacion" [disabled]="disabled || obteniendoUbicacion()" (click)="usarUbicacionActual()">
+      {{ obteniendoUbicacion() ? 'Obteniendo ubicación…' : 'Usar mi ubicación actual' }}
+    </button>
+    <span>También puedes tocar el mapa o arrastrar el marcador.</span>
+  </div>
+  @if (errorUbicacion()) { <p class="aviso error" role="alert">{{ errorUbicacion() }}</p> }
+  @if (errorMapa()) { <p class="aviso error" role="alert">{{ errorMapa() }}</p> }
+  <div class="mapa-marco">
+    <div #mapa class="mapa" tabindex="0" role="application" aria-label="Mapa interactivo del incidente. Para elegir un punto con teclado, usa la opción de coordenadas manuales."></div>
+  </div>
+  <p class="ayuda-mapa">Mueve y amplía el mapa para orientarte. Solo se selecciona un lugar al tocar el mapa, arrastrar el marcador o usar una ubicación obtenida.</p>
+  @if (punto(); as elegido) {
+    <div class="punto-elegido" role="status">
+      <strong>Punto elegido</strong>
+      <span>Latitud {{ elegido.latitud.toFixed(6) }} · longitud {{ elegido.longitud.toFixed(6) }}</span>
+      @if (origen() === 'dispositivo') {
+        <span>Ubicación aproximada del dispositivo@if (precisionMetros() !== null) { (precisión informada: {{ precisionMetros() }} m) }. Confirma si este punto corresponde al incidente; puedes mover el marcador.</span>
+      } @else {
+        <span>Puedes cambiar el punto tocando el mapa, arrastrando el marcador o introduciendo otras coordenadas.</span>
+      }
+    </div>
+  } @else {
+    <p class="sin-punto" role="status">Aún no has señalado dónde ocurrió el incidente. El reporte necesita un punto elegido.</p>
+  }
+  <button type="button" class="alternar-manual" [attr.aria-expanded]="manualAbierto()" aria-controls="coordenadas-manuales" (click)="alternarManual()">
+    {{ manualAbierto() ? 'Ocultar coordenadas manuales' : 'Introducir coordenadas manualmente' }}
+  </button>
+  @if (manualAbierto()) {
+    <div id="coordenadas-manuales" class="manual" [formGroup]="manual">
+      <p>Úsalas si el mapa no funciona o prefieres introducir un punto preciso. Escribe valores reales en grados decimales.</p>
+      <div class="manual-grid">
+        <div class="campo">
+          <label for="reporte-latitud">Latitud</label>
+          <input id="reporte-latitud" type="text" inputmode="decimal" autocomplete="off" formControlName="latitud" placeholder="Ej.: -11.9823" [attr.aria-invalid]="latitudManualInvalida()" [attr.aria-describedby]="latitudManualInvalida() ? 'latitud-manual-error' : null" (input)="cambiarManual()" />
+          @if (latitudManualInvalida()) { <small id="latitud-manual-error">Usa un valor entre −90 y 90.</small> }
+        </div>
+        <div class="campo">
+          <label for="reporte-longitud">Longitud</label>
+          <input id="reporte-longitud" type="text" inputmode="decimal" autocomplete="off" formControlName="longitud" placeholder="Ej.: -77.0645" [attr.aria-invalid]="longitudManualInvalida()" [attr.aria-describedby]="longitudManualInvalida() ? 'longitud-manual-error' : null" (input)="cambiarManual()" />
+          @if (longitudManualInvalida()) { <small id="longitud-manual-error">Usa un valor entre −180 y 180.</small> }
+        </div>
+      </div>
+    </div>
+  }
+</div>

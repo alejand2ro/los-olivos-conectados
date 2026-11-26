@@ -1,0 +1,72 @@
+<ion-content [fullscreen]="true">
+  <div class="page-shell" [class.modo-accesible]="modoAccesible()">
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <app-site-header [soloPublico]="true" />
+
+    <main id="contenido" class="main-layout">
+      <section class="intro" aria-labelledby="titulo-inicio">
+        <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> Proyecto vecinal en desarrollo</span>
+        <h1 id="titulo-inicio">Un espacio para estar más conectados en Los Olivos.</h1>
+        <p class="lead">Crea tu cuenta y elige tu zona de residencia. Este proyecto incorporará reportes, alertas verificadas y comunicación vecinal por etapas.</p>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-orbit orbit-one"></div>
+          <div class="art-orbit orbit-two"></div>
+          <div class="art-node node-one"></div>
+          <div class="art-node node-two"></div>
+          <div class="art-node node-three"></div>
+          <div class="building building-one"></div>
+          <div class="building building-two"></div>
+          <div class="building building-three"></div>
+          <div class="art-caption"><span class="caption-mark">●</span> Comunidad por zonas</div>
+        </div>
+
+        <div class="feature-strip" aria-label="Objetivos del proyecto">
+          <div><span class="feature-icon" aria-hidden="true">01</span><strong>Reportes</strong><small>Seguimiento en preparación</small></div>
+          <div><span class="feature-icon green" aria-hidden="true">02</span><strong>Alertas</strong><small>Publicación tras verificación</small></div>
+          <div><span class="feature-icon" aria-hidden="true">03</span><strong>Por zonas</strong><small>Cuenta vinculada a tu residencia</small></div>
+        </div>
+      </section>
+
+      <section class="access-card" [attr.aria-labelledby]="usuario() ? null : vista() === 'login' ? 'acceso-titulo' : 'registro-titulo'">
+        @if (verificandoSesion()) {
+          <p class="loading-state" role="status">Comprobando tu sesión…</p>
+        } @else if (usuario()) {
+          <p class="loading-state" role="status">Abriendo tu espacio…</p>
+        } @else {
+          @if (errorSesion()) {
+            <p class="session-error" role="alert">{{ errorSesion() }}</p>
+          }
+          @if (vista() === 'login') {
+            <app-login-form
+              [cargando]="enviandoLogin()"
+              [error]="errorLogin()"
+              (entrar)="entrar($event)"
+              (abrirRegistro)="mostrarRegistro()"
+            />
+          } @else {
+            <app-registro-form
+              [catalogos]="catalogosRegistro()"
+              [cargandoCatalogos]="cargandoCatalogos()"
+              [errorCatalogos]="errorCatalogos()"
+              [enviando]="enviandoRegistro()"
+              [error]="errorRegistro()"
+              [exito]="registroExitoso()"
+              [modoAccesibilidadInicial]="modoAccesible()"
+              (registrar)="registrar($event)"
+              (volverAlLogin)="mostrarLogin()"
+              (reintentarCatalogos)="cargarCatalogos()"
+              (modoAccesibilidadChange)="modoAccesible.set($event)"
+            />
+          }
+        }
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Los Olivos Conectados</span>
+      <span>Proyecto en desarrollo · Lima, Perú</span>
+    </footer>
+  </div>
+</ion-content>

@@ -1,0 +1,26 @@
+:host { display:block; min-width:0; }
+:host *, :host *::before, :host *::after { box-sizing:border-box; }
+.selector-ubicacion { min-width:0; }
+.acciones { display:flex; align-items:center; flex-wrap:wrap; gap:.7rem; margin:.5rem 0 1rem; }
+.acciones span,.ayuda-mapa,.manual p { color:#53627b; font-size:.84rem; line-height:1.5; }
+button { font:inherit; cursor:pointer; }
+.boton-ubicacion { min-height:2.8rem; padding:.65rem 1rem; border:1px solid #1e3a8a; border-radius:.7rem; color:#1e3a8a; background:#eff4ff; font-weight:800; }
+.boton-ubicacion:disabled { opacity:.6; cursor:default; }
+.mapa-marco { overflow:hidden; width:100%; border:1px solid #b9c9e1; border-radius:.8rem; background:#eaf0f5; }
+.mapa { width:100%; height:clamp(18rem,40vw,25rem); min-height:18rem; }
+.ayuda-mapa { margin:.7rem 0 1rem; }
+.aviso { margin:.5rem 0 1rem; padding:.75rem 1rem; border-radius:.6rem; }
+.error { border:1px solid #f0c7c1; color:#8b1b16; background:#fff0ed; }
+.punto-elegido,.sin-punto { display:grid; gap:.3rem; margin:1rem 0; padding:.85rem 1rem; border:1px solid #9bc9b5; border-radius:.7rem; color:#123d32; background:#eefaf3; font-size:.88rem; line-height:1.5; }
+.sin-punto { border-color:#cbd6e8; color:#34455f; background:#f6f8fc; }
+.alternar-manual { padding:.4rem 0; border:0; color:#1e3a8a; background:transparent; font-weight:800; text-decoration:underline; text-underline-offset:3px; }
+.manual { margin-top:.6rem; padding:1rem; border:1px solid #dbe5f2; border-radius:.75rem; background:#f8fbff; }
+.manual p { margin:0 0 .8rem; }
+.manual-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; gap:1rem; }
+.campo { display:grid; align-content:start; gap:.4rem; min-width:0; }
+.campo label { font-size:.9rem; font-weight:800; }
+.campo input { display:block; width:100%; min-width:0; min-height:3rem; padding:.75rem .85rem; border:1px solid #b9c9e1; border-radius:.75rem; color:#122441; background:#fff; font:inherit; }
+.campo input[aria-invalid=true] { border-color:#b42318; }
+.campo small { color:#a31d18; line-height:1.4; }
+button:focus-visible,input:focus-visible,.mapa:focus-visible { outline:3px solid #f5ae46; outline-offset:3px; }
+@media(max-width:620px) { .manual-grid { grid-template-columns:1fr; }.mapa { height:20rem; } }

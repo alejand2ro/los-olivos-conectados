@@ -1,0 +1,13 @@
+:host { display:block; }
+:host *, :host *::before, :host *::after { box-sizing:border-box; }
+.nota-voz { display:grid; gap:.7rem; min-width:0; }
+.ayuda { margin:0; color:#53627b; font-size:.85rem; line-height:1.5; }
+.estado { margin:0; color:#123d32; font-weight:700; }
+.error { margin:0; padding:.8rem 1rem; border:1px solid #f0c7c1; border-radius:.7rem; color:#8b1b16; background:#fff0ed; }
+.acciones { display:flex; flex-wrap:wrap; gap:.65rem; }
+button { width:fit-content; min-height:2.8rem; padding:.65rem 1rem; border:1px solid #1e3a8a; border-radius:.7rem; color:#1e3a8a; background:#eff4ff; font:inherit; font-weight:800; cursor:pointer; }
+.grabar { color:#fff; background:#1e3a8a; }
+.detener { color:#fff; border-color:#a31d18; background:#a31d18; }
+button:disabled { opacity:.6; cursor:default; }
+audio { display:block; width:min(100%,32rem); }
+button:focus-visible,audio:focus-visible { outline:3px solid #f5ae46; outline-offset:3px; }

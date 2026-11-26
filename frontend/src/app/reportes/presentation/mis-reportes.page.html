@@ -1,0 +1,50 @@
+<ion-content [fullscreen]="true">
+  <div class="reportes-shell">
+    <a class="skip-link" href="#contenido-reportes">Saltar al contenido</a>
+    <app-site-header [sesionProtegida]="true" [perfilValidado]="perfil()" [zonaValidada]="zonaNombre()" />
+    <main id="contenido-reportes" class="content">
+      <p class="eyebrow">Seguimiento personal</p>
+      <div class="page-heading"><h1>Mis Reportes</h1><a class="new-report" routerLink="/reportes/nuevo">Nuevo reporte</a></div>
+      <p class="lead">Consulta el estado de los incidentes que enviaste. Los reportes pendientes de verificación no aparecen en la lista pública de alertas.</p>
+
+      @if (cargando()) {
+        <p class="notice" role="status">Cargando tus reportes…</p>
+      } @else if (error()) {
+        <div class="notice error" role="alert">
+          <p>{{ error() }}</p>
+          <button type="button" (click)="cargar(pagina()?.pagina ?? 1)">Reintentar</button>
+        </div>
+      } @else if (pagina(); as listado) {
+        @if (listado.resultados.length) {
+          <ul class="report-list">
+            @for (reporte of listado.resultados; track reporte.id) {
+              <li>
+                <span class="report-mark" aria-hidden="true">{{ reporte.es_sos ? '!' : '◆' }}</span>
+                <div class="report-copy">
+                  <strong>{{ reporte.es_sos ? 'SOS' : reporte.tipo_incidente || 'Incidente' }} · Reporte #{{ reporte.id }}</strong>
+                  <time [attr.datetime]="reporte.fecha_creacion">{{ reporte.fecha_creacion | date:'medium' }}</time>
+                  <span>Zona del incidente: {{ zonaDelIncidente(reporte.zona_id) }}</span>
+                  <span>Estado: {{ reporte.estado_nombre }}</span>
+                </div>
+                <span class="badge" [class.verified]="reporte.verificado">{{ reporte.verificado ? 'Verificado' : 'Pendiente de verificación' }}</span>
+                <a class="detail-link" [routerLink]="['/reportes', reporte.id]" [attr.aria-label]="'Ver detalle del reporte ' + reporte.id">Ver detalle</a>
+              </li>
+            }
+          </ul>
+        } @else if (listado.total === 0) {
+          <p class="notice">Aún no tienes reportes. <a routerLink="/reportes/nuevo">Crea tu primer reporte</a> para empezar el seguimiento.</p>
+        } @else {
+          <p class="notice">Esta página no contiene reportes. Puedes volver a la anterior.</p>
+        }
+        @if (listado.total_paginas > 1) {
+          <div class="pagination" aria-label="Páginas de mis reportes">
+            <button type="button" (click)="cargar(listado.pagina - 1)" [disabled]="listado.pagina <= 1">Anterior</button>
+            <span>Página {{ listado.pagina }} de {{ listado.total_paginas }}</span>
+            <button type="button" (click)="cargar(listado.pagina + 1)" [disabled]="listado.pagina >= listado.total_paginas">Siguiente</button>
+          </div>
+        }
+      }
+    </main>
+    <footer>Los Olivos Conectados · Proyecto en desarrollo</footer>
+  </div>
+</ion-content>
